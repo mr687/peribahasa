@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login</title>
+
+    <!-- bootstrap CSS - Include with every page -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="font-awesome/css/font-awesome.css" rel="stylesheet">
+
+    <!-- Custom CSS - Include with every page -->
+    <link href="css/style.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4">
+                <div class="bt-login-panel panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Login</h3>
+                    </div>
+                    <div class="panel-body">
+                        <form role="form"  action="pages/login/login.php">                            
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="ID " name="username" type="email" autofocus>
+                                </div>
+                           
+                              
+                            <div class="form-group">
+                                    <input class="form-control" placeholder="Password" name="pass" type="password" value="">
+                                </div>
+                           
+                     
+                                  <input type="button"  class="btn btn-success" value="Login"  />  
+
+								<hr />
+							<div class="form-group">
+                                 <input type="button" class="btn btn-default" value="Kembali" onclick="history.back(-1)" />
+                                </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   
+</body>
+
+</html>
