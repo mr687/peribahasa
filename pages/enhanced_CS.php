@@ -1,11 +1,33 @@
 <?php		
-require_once('connect.php');//Koneksi ke database			
+function Enhanced_CS($kata){
+	
+	$kataAsal = $kata;
+	
+	/* 1. Cek Kata di Kamus jika Ada SELESAI */
+	if(cekKamus($kata)){ // Cek Kamus
+		return $kata; // Jika Ada kembalikan
+	}
+	
+	/* 2. Buang Infection suffixes (\-lah", \-kah", \-ku", \-mu", atau \-nya") */
+	$kata = Del_Inflection_Suffixes($kata);
+	
+	/* 3. Buang Derivation suffix (\-i" or \-an") */
+	$kata = Del_Derivation_Suffixes($kata);
+	
+	/* 4. Buang Derivation prefix */
+	$kata = Del_Derivation_Prefix($kata);
+	
+	return $kata;
+}		
 function cekKamus($kata){
+	//Koneksi ke database	
+	include('koneksi.php');
+	
 	// cari di database	
 	$sql = "SELECT * from tb_katadasar where katadasar ='$kata' LIMIT 1";
 	//echo $sql.'<br/>';
-	$result = mysql_query($sql) or die(mysql_error());  
-	if(mysql_num_rows($result)==1){
+	$result = mysqli_query($link,$sql) or die(mysqli_error());  
+	if(mysqli_num_rows($result)==1){
 		return true; // True jika ada
 	}else{
 		return false; // jika tidak ada FALSE
@@ -855,23 +877,5 @@ function Del_Derivation_Prefix($kata){
 	
 	return $kataAsal;
 }
-function Enhanced_CS($kata){
-	
-	$kataAsal = $kata;
-	
-	/* 1. Cek Kata di Kamus jika Ada SELESAI */
-	if(cekKamus($kata)){ // Cek Kamus
-		return $kata; // Jika Ada kembalikan
-	}
-	/* 2. Buang Infection suffixes (\-lah", \-kah", \-ku", \-mu", atau \-nya") */
-	$kata = Del_Inflection_Suffixes($kata);
-		
-	/* 3. Buang Derivation suffix (\-i" or \-an") */
-	$kata = Del_Derivation_Suffixes($kata);
-		
-	/* 4. Buang Derivation prefix */
-	$kata = Del_Derivation_Prefix($kata);
-	
-	return $kata;
-}
+
 ?>

@@ -10,7 +10,7 @@ require_once 'kmp/kmp.php';
 #echo "tampil: "
 
 $text = "ada udang dibalik batu";
-$pattern = $_POST['kata'];
+$pattern = (isset($_POST['kata']) ? $_POST['kata'] : "");
 
 $result = kmp($text, $pattern);
 if ($result === false)

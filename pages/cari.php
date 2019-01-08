@@ -1,6 +1,8 @@
 <!-- BASIC AWAL 1-->
 <?php
 require_once('Enhanced_CS.php');
+require_once('kmp/kmp.php');
+require_once('koneksi.php');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -24,34 +26,30 @@ require_once('Enhanced_CS.php');
                         <!-- /.panel-body -->
 						<div class="form-group">
 							Input Text <br><br>
-							<form method="post" action="">
-							<input type="text" name="kata" id="kata" size="100" value="<?php if(isset($_POST['kata'])){ echo $_POST['kata']; }else{ echo '';}?>">
-							<input class="btnForm" type="submit" name="submit" value="Cari"/>
+							<form id="form1" method="post" action="">
+								<input type="text" name="kata" id="kata" size="100" value="<?php if(isset($_POST['kata'])){ echo $_POST['kata']; }else{ echo '';}?>">
+								<input class="btnForm" type="button" onclick="getdata()" name="submit" value="Cari"/>
 							</form>
-							<?php
-							if(isset($_POST['kata'])){
-								$teksAsli = $_POST['kata'];
-								echo "Teks asli : ".$teksAsli.'<br/>';
-								$stemming = Enhanced_CS($teksAsli);
-								echo "Kata dasar : ".$stemming.'<br/>';
-							}
-							?>
 						</div>
-						
+
                     </div>
-						 
 				</div>
-						<!-- /.panel -->
-                    
             </div>
-					
-                    <!-- /.panel -->
                 </div> 
-				
-                <!-- /.col-lg-12 -->
             </div>
 		</div>	
 		<?php include 'sama/footer.php';?>
 	</body>
+	<script>
+		function getdata(){
+			var kata = $("#kata").val();
+			$.post(
+				"controller/proses.php",
+				{kata:kata})
+			.done(function(data){
+				alert(data);
+			});
+		}
+	</script>
 </html>
 	
