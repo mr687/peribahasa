@@ -1,20 +1,22 @@
 -- phpMyAdmin SQL Dump
--- version 4.3.11
--- http://www.phpmyadmin.net
+-- version 4.8.4
+-- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: 22 Nov 2018 pada 15.02
--- Versi Server: 5.6.24
--- PHP Version: 5.6.8
+-- Generation Time: Jan 09, 2019 at 04:17 PM
+-- Server version: 10.1.37-MariaDB
+-- PHP Version: 5.6.39
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
 SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
 -- Database: `peribahasa`
@@ -23,19 +25,19 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `periba`
+-- Table structure for table `periba`
 --
 
-CREATE TABLE IF NOT EXISTS `periba` (
+CREATE TABLE `periba` (
   `id_peribahasa` int(11) NOT NULL,
   `nama_peribahasa` text NOT NULL,
   `arti_peribahasa` text NOT NULL,
   `id_kategori` varchar(5) NOT NULL,
   `id_admin` varchar(5) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=1011 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data untuk tabel `periba`
+-- Dumping data for table `periba`
 --
 
 INSERT INTO `periba` (`id_peribahasa`, `nama_peribahasa`, `arti_peribahasa`, `id_kategori`, `id_admin`) VALUES
@@ -754,7 +756,7 @@ INSERT INTO `periba` (`id_peribahasa`, `nama_peribahasa`, `arti_peribahasa`, `id
 (712, 'Menabur bijan ke tasik ', '  sia-sia saja memberi fatwa / nasihat kepada orang yang bebal / dungu', '', ''),
 (713, 'Mempertajam sanding ', '  memperbasar peselisihan antara dua belah pihak yang bersengketa', '', ''),
 (714, 'Mencari umbut di batu ', '  pekerjaan yang sia-sia', '', ''),
-(715, 'Mencari jarum di tumpukan jerami'' ', '  melakukan pekerjaan yang sangat sukar, hampir sia-sia saja untuk dilakukan', '', ''),
+(715, 'Mencari jarum di tumpukan jerami\' ', '  melakukan pekerjaan yang sangat sukar, hampir sia-sia saja untuk dilakukan', '', ''),
 (716, 'Mencari yang sehasta sejengkal ', '  menyelidiki tentang jauh dekatnya hubungan keluarga', '', ''),
 (717, 'Mencencang berlandasan, melompat bersitumpu ', '  jika hendak melakukan sesuatu pekerjaan sediakan / perhatikan terlebih dahulu syarat-syaratnya', '', ''),
 (718, 'Mencencang memampas, membunuh membangun ', '  yang bersalah harus dihukum setimpal dengan perbuatannya', '', ''),
@@ -1055,17 +1057,17 @@ INSERT INTO `periba` (`id_peribahasa`, `nama_peribahasa`, `arti_peribahasa`, `id
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `sinonim`
+-- Table structure for table `sinonim`
 --
 
-CREATE TABLE IF NOT EXISTS `sinonim` (
+CREATE TABLE `sinonim` (
   `id` int(11) NOT NULL,
   `kata` varchar(50) DEFAULT NULL,
   `sinonim` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=15706 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data untuk tabel `sinonim`
+-- Dumping data for table `sinonim`
 --
 
 INSERT INTO `sinonim` (`id`, `kata`, `sinonim`) VALUES
@@ -16802,15 +16804,15 @@ INSERT INTO `sinonim` (`id`, `kata`, `sinonim`) VALUES
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `stopwords`
+-- Table structure for table `stopwords`
 --
 
-CREATE TABLE IF NOT EXISTS `stopwords` (
+CREATE TABLE `stopwords` (
   `value` varchar(18) CHARACTER SET utf8 DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data untuk tabel `stopwords`
+-- Dumping data for table `stopwords`
 --
 
 INSERT INTO `stopwords` (`value`) VALUES
@@ -17576,17 +17578,17 @@ INSERT INTO `stopwords` (`value`) VALUES
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_admin`
+-- Table structure for table `tb_admin`
 --
 
-CREATE TABLE IF NOT EXISTS `tb_admin` (
+CREATE TABLE `tb_admin` (
   `id_admin` varchar(10) NOT NULL,
   `password` varchar(15) NOT NULL,
   `nama_admin` varchar(15) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data untuk tabel `tb_admin`
+-- Dumping data for table `tb_admin`
 --
 
 INSERT INTO `tb_admin` (`id_admin`, `password`, `nama_admin`) VALUES
@@ -17595,17 +17597,17 @@ INSERT INTO `tb_admin` (`id_admin`, `password`, `nama_admin`) VALUES
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_katadasar`
+-- Table structure for table `tb_katadasar`
 --
 
-CREATE TABLE IF NOT EXISTS `tb_katadasar` (
+CREATE TABLE `tb_katadasar` (
   `id_ktdasar` int(10) NOT NULL,
   `katadasar` varchar(20) NOT NULL,
   `tipe_katadasar` varchar(20) NOT NULL
-) ENGINE=MyISAM AUTO_INCREMENT=28533 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
--- Dumping data untuk tabel `tb_katadasar`
+-- Dumping data for table `tb_katadasar`
 --
 
 INSERT INTO `tb_katadasar` (`id_ktdasar`, `katadasar`, `tipe_katadasar`) VALUES
@@ -46158,16 +46160,16 @@ INSERT INTO `tb_katadasar` (`id_ktdasar`, `katadasar`, `tipe_katadasar`) VALUES
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_kategori`
+-- Table structure for table `tb_kategori`
 --
 
-CREATE TABLE IF NOT EXISTS `tb_kategori` (
+CREATE TABLE `tb_kategori` (
   `id_kategori` varchar(5) NOT NULL,
   `nama_kategori` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data untuk tabel `tb_kategori`
+-- Dumping data for table `tb_kategori`
 --
 
 INSERT INTO `tb_kategori` (`id_kategori`, `nama_kategori`) VALUES
@@ -46176,10 +46178,10 @@ INSERT INTO `tb_kategori` (`id_kategori`, `nama_kategori`) VALUES
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tb_peribahasa`
+-- Table structure for table `tb_peribahasa`
 --
 
-CREATE TABLE IF NOT EXISTS `tb_peribahasa` (
+CREATE TABLE `tb_peribahasa` (
   `id_peribahasa` int(5) NOT NULL,
   `nama_peribahasa` varchar(100) NOT NULL,
   `arti_peribahasa` varchar(100) NOT NULL,
@@ -46188,7 +46190,7 @@ CREATE TABLE IF NOT EXISTS `tb_peribahasa` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data untuk tabel `tb_peribahasa`
+-- Dumping data for table `tb_peribahasa`
 --
 
 INSERT INTO `tb_peribahasa` (`id_peribahasa`, `nama_peribahasa`, `arti_peribahasa`, `id_kategori`, `id_admin`) VALUES
@@ -46237,17 +46239,21 @@ ALTER TABLE `tb_kategori`
 -- AUTO_INCREMENT for table `periba`
 --
 ALTER TABLE `periba`
-  MODIFY `id_peribahasa` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1011;
+  MODIFY `id_peribahasa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1011;
+
 --
 -- AUTO_INCREMENT for table `sinonim`
 --
 ALTER TABLE `sinonim`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=15706;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15706;
+
 --
 -- AUTO_INCREMENT for table `tb_katadasar`
 --
 ALTER TABLE `tb_katadasar`
-  MODIFY `id_ktdasar` int(10) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=28533;
+  MODIFY `id_ktdasar` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28533;
+COMMIT;
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
