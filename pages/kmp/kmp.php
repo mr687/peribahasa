@@ -10,12 +10,14 @@ function kmp($text, $pattern)
 		$match = true;
 		for ($j = 0; $j < $pattlen; $j++)
 		{
-			if ($text[$i + $j] != $pattern[$j])
-			{
-				$match = false;
-				$i += $j;
-				break;
-			}
+			if(isset($text[$i + $j]) && isset($pattern[$j])):
+				if ($text[$i + $j] != $pattern[$j])
+				{
+					$match = false;
+					$i += $j;
+					break;
+				}
+			endif;
 		}
 
 		if ($match) return $i;		

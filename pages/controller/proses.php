@@ -24,7 +24,6 @@ function checkkmp($text = "",$pattern = array()){
 	}
 	return false;
 }
-
 // funtion check kata imbuhan dan menghapusnya
 function checkword($w){
 	include '../koneksi.php';
@@ -84,18 +83,72 @@ function netral($words){
 	return $words;
 }
 
+// function cari sinonim dan cari di database peribahasa
+function checkrelate($katadasar = []){
+	$sinonim = array();
+	foreach($katadasar as $k => $v):
+		$si = mysqli_fetch_assoc(db_get("SELECT * FROM sinonim WHERE kata='" . $v . "'"));
+		if(count($si) > 0){
+			$sinonim[] = split(",",trim(str_replace(" ","",$si['sinonim']),","));
+		}
+	endforeach;
+
+	$peribahasa = array();
+	$q = db_get("SELECT * FROM periba");
+	while($d = mysqli_fetch_array($q)){
+		$peribahasa[] = $d;
+	}
+	$kmp = [];
+	foreach($peribahasa as $k => $v):
+		foreach($sinonim as $kk => $vv):
+			if(checkkmp(trim($v['nama_peribahasa']),$vv)):
+				if(!in_array(trim($v['nama_peribahasa']),$kmp)){
+					$kmp[] = $v;
+				}
+			endif;
+		endforeach;
+	endforeach;
+	return $kmp;
+}
+
 // function mengembalikan hasil berbentuk table
-function populate($data = []){
+function populate($data = [],$relate = []){
 	if(count($data) < 1){
 		return false;
 	}
+	$content = "<div class=\"title\">";
+	$content .= "<h3><Strong id=\"title\">";
+	$content .= $data['nama_peribahasa'];
+	$content .= "</Strong></h3>";
+	$content .= "<p>";
+	$content .= $data['arti_peribahasa'];
+	$content .= "</p>";
+	$content .= "</div>";
+	$kmp = checkrelate($relate);
+	if(count($kmp) > 0):
+		$content .= "<div class=\"relate\" style=\"margin-top:60px;\">";
+		$content .= "<h4><u>Peribahasa serupa</u></h4>";
+		$content .= "<div class=\"col-md-5\">";
+		$content .= "<ul class=\"list-group\">";
+		foreach($kmp as $k=> $v):
+			$content .= "<li class=\"list-group-item\">";
+			$content .= "<a href=\"http://localhost/peribahasa/pages/cari.php?kata=" . $v['nama_peribahasa'] . "\">";
+			$content .= trim($v['nama_peribahasa']);
+			$content .= "</a>";
+			$content .= "</li>";
+		endforeach;
+		$content .= "</li>";
+		$content .= "</div>";
+	endif;
+	$content .= "</div>";
 
-
+	echo $content;
 }
 
 if(isset($_POST['kata']) && $_POST['kata'] != ''){
 	
 	$asli = $_POST['kata'];
+	unset($_POST['kata']);
 	$target = $asli;
 	// menetralkan kalimat
 	$target = netral($target);
@@ -111,15 +164,15 @@ if(isset($_POST['kata']) && $_POST['kata'] != ''){
 	$sql = "SELECT * FROM periba WHERE nama_peribahasa='" . $asli . "'";
 	if(count(mysqli_fetch_array(db_get($sql))) > 0):
 		$periba = array();
-		$n = 0;
-		while($p = mysqli_fetch_array(db_get($sql))){
-			$periba[$n]["id_peribahasa"] = $p['id_peribahasa'];
-			$periba[$n]["nama_peribahasa"] = $p['nama_peribahasa'];
-			$periba[$n]["arti_peribahasa"] = $p['arti_peribahasa'];
-			$periba[$n]["id_kategori"] = $p['id_kategori'];
-			$periba[$n]["id_admin"] = $p['id_admin'];
+		$aa = db_get($sql);
+		while($p = mysqli_fetch_array($aa)){
+			$periba["id_peribahasa"] = $p['id_peribahasa'];
+			$periba["nama_peribahasa"] = $p['nama_peribahasa'];
+			$periba["arti_peribahasa"] = $p['arti_peribahasa'];
+			$periba["id_kategori"] = $p['id_kategori'];
+			$periba["id_admin"] = $p['id_admin'];
 		}
-		populate($periba);
+		populate($periba, $katadasar);
 		return;
 	endif;
 
@@ -140,16 +193,16 @@ if(isset($_POST['kata']) && $_POST['kata'] != ''){
 	}
 	foreach($datas as $k => $v){
 		if(checkkmp($v["nama_peribahasa"],$katadasar)){
-			$periba[0]["id_peribahasa"] = $v['id_peribahasa'];
-			$periba[0]["nama_peribahasa"] = $v['nama_peribahasa'];
-			$periba[0]["arti_peribahasa"] = $v['arti_peribahasa'];
-			$periba[0]["id_kategori"] = $v['id_kategori'];
-			$periba[0]["id_admin"] = $v['id_admin'];
-			populate($periba);
+			$periba["id_peribahasa"] = $v['id_peribahasa'];
+			$periba["nama_peribahasa"] = $v['nama_peribahasa'];
+			$periba["arti_peribahasa"] = $v['arti_peribahasa'];
+			$periba["id_kategori"] = $v['id_kategori'];
+			$periba["id_admin"] = $v['id_admin'];
+			populate($periba, $katadasar);
 			return;
 		}
 	}
 
-	echo "Peribahasa tidak ditemukan.";
+	echo "<p>Peribahasa tidak ditemukan.</p>";
 }
 ?>
