@@ -14,13 +14,29 @@ function db_get($q = ''){
 // function Cek kesamaan database dengan kmp
 function checkkmp($text = "",$pattern = array()){
 	if($text != "" && count($pattern) > 0){
-		for($i=0;$i<count($pattern);$i++){
-			$getkmp = kmp($text,$pattern[$i]);
+		foreach($pattern as $k => $v):
+			$getkmp = kmp($text,$v);
 			if(!$getkmp){
 				return false;
 			}
-		}
+		endforeach;
 		return true;
+	}
+	return false;
+}
+function checkkmp2($text = "",$pattern = array()){
+	if($text != "" && count($pattern) > 0){
+		$textlower = strtolower($text);
+		$kmp = array();
+		foreach($pattern as $k => $v):
+			foreach($v as $kk => $vv):
+				$getkmp = kmp($textlower,$vv);
+				if($getkmp){
+					$kmp = $text;
+				}
+			endforeach;
+		endforeach;
+		return $kmp;
 	}
 	return false;
 }
@@ -52,7 +68,7 @@ function basicword($words = ""){
 			$stemming = Enhanced_CS($pecah[$i]);
 			$katadasar[] = $stemming;
 		}
-		return $katadasar;
+		return array_filter($katadasar);
 	}
 	return null;
 }
@@ -79,32 +95,37 @@ function netral($words){
 	$words = str_replace("^", " ", $words);
 	$words = str_replace("*", " ", $words);
 	$words = str_replace("#", " ", $words);
-
+	$words = str_replace("&", " ", $words);
+	
+	$words = strtolower($words);
 	return $words;
 }
 
 // function cari sinonim dan cari di database peribahasa
-function checkrelate($katadasar = []){
-	$sinonim = array();
-	foreach($katadasar as $k => $v):
-		$si = mysqli_fetch_assoc(db_get("SELECT * FROM sinonim WHERE kata='" . $v . "'"));
-		if(count($si) > 0){
-			$sinonim[] = split(",",trim(str_replace(" ","",$si['sinonim']),","));
-		}
-	endforeach;
-
-	$peribahasa = array();
-	$q = db_get("SELECT * FROM periba");
-	while($d = mysqli_fetch_array($q)){
-		$peribahasa[] = $d;
-	}
+function checkrelate($data = []){
 	$kmp = [];
-	foreach($peribahasa as $k => $v):
-		foreach($sinonim as $kk => $vv):
-			if(checkkmp(trim($v['nama_peribahasa']),$vv)):
-				if(!in_array(trim($v['nama_peribahasa']),$kmp)){
-					$kmp[] = $v;
-				}
+	foreach($data as $k => $v):
+		$sinonim = array();
+		$katada = basicword(netral(checkword($v['nama_peribahasa'])));
+		foreach(array_unique($katada) as $kk => $vv):
+			if($vv == ""):
+				continue;
+			endif;
+			$si = mysqli_fetch_assoc(db_get("SELECT * FROM sinonim WHERE kata='" . $vv . "' OR sinonim like '%" . $vv . "'"));
+			if(count($si) > 0){
+				$split = split(",",trim(str_replace(" ","",$si['sinonim'].','.$si["kata"]),","));
+				$split = array_diff($split,[$vv]);
+				$sinonim[] = $split;
+			}
+		endforeach;
+		$peribahasa = array();
+		$q = db_get("SELECT * FROM periba");
+		while($d = mysqli_fetch_array($q)){
+			$peribahasa[] = $d;
+		}
+		foreach($peribahasa as $kk => $vv):
+			if(checkkmp2($vv['nama_peribahasa'],$sinonim)):
+				$kmp[] = $vv;
 			endif;
 		endforeach;
 	endforeach;
@@ -112,37 +133,22 @@ function checkrelate($katadasar = []){
 }
 
 // function mengembalikan hasil berbentuk table
-function populate($data = [],$relate = []){
+function proses($data = []){
 	if(count($data) < 1){
+		echo json_encode(["status" => "kosong","data"=>[],"relate"=>[]]);
 		return false;
 	}
-	$content = "<div class=\"title\">";
-	$content .= "<h3><Strong id=\"title\">";
-	$content .= $data['nama_peribahasa'];
-	$content .= "</Strong></h3>";
-	$content .= "<p>";
-	$content .= $data['arti_peribahasa'];
-	$content .= "</p>";
-	$content .= "</div>";
-	$kmp = checkrelate($relate);
-	if(count($kmp) > 0):
-		$content .= "<div class=\"relate\" style=\"margin-top:60px;\">";
-		$content .= "<h4><u>Peribahasa serupa</u></h4>";
-		$content .= "<div class=\"col-md-5\">";
-		$content .= "<ul class=\"list-group\">";
-		foreach($kmp as $k=> $v):
-			$content .= "<li class=\"list-group-item\">";
-			$content .= "<a href=\"http://localhost/peribahasa/pages/cari.php?kata=" . $v['nama_peribahasa'] . "\">";
-			$content .= trim($v['nama_peribahasa']);
-			$content .= "</a>";
-			$content .= "</li>";
-		endforeach;
-		$content .= "</li>";
-		$content .= "</div>";
-	endif;
-	$content .= "</div>";
+	$data["data"] = $data;
+	$data["status"] = "sukses";
+	$data["relate"] = [];
 
-	echo $content;
+	$h = checkrelate($data["data"]);
+	if($h):
+		$data["relate"] = $h;
+	endif;
+
+	echo json_encode($data);
+	return true;
 }
 
 if(isset($_POST['kata']) && $_POST['kata'] != ''){
@@ -165,14 +171,16 @@ if(isset($_POST['kata']) && $_POST['kata'] != ''){
 	if(count(mysqli_fetch_array(db_get($sql))) > 0):
 		$periba = array();
 		$aa = db_get($sql);
+		$n = 0;
 		while($p = mysqli_fetch_array($aa)){
-			$periba["id_peribahasa"] = $p['id_peribahasa'];
-			$periba["nama_peribahasa"] = $p['nama_peribahasa'];
-			$periba["arti_peribahasa"] = $p['arti_peribahasa'];
-			$periba["id_kategori"] = $p['id_kategori'];
-			$periba["id_admin"] = $p['id_admin'];
+			$periba[$n]["id_peribahasa"] = $p['id_peribahasa'];
+			$periba[$n]["nama_peribahasa"] = $p['nama_peribahasa'];
+			$periba[$n]["arti_peribahasa"] = $p['arti_peribahasa'];
+			$periba[$n]["id_kategori"] = $p['id_kategori'];
+			$periba[$n]["id_admin"] = $p['id_admin'];
+			$n++;
 		}
-		populate($periba, $katadasar);
+		proses($periba);
 		return;
 	endif;
 
@@ -191,18 +199,22 @@ if(isset($_POST['kata']) && $_POST['kata'] != ''){
 	while($data = mysqli_fetch_array($q)){
 		$datas[] = $data;
 	}
+	$periba = [];
+	$n = 0;
 	foreach($datas as $k => $v){
 		if(checkkmp($v["nama_peribahasa"],$katadasar)){
-			$periba["id_peribahasa"] = $v['id_peribahasa'];
-			$periba["nama_peribahasa"] = $v['nama_peribahasa'];
-			$periba["arti_peribahasa"] = $v['arti_peribahasa'];
-			$periba["id_kategori"] = $v['id_kategori'];
-			$periba["id_admin"] = $v['id_admin'];
-			populate($periba, $katadasar);
-			return;
+			$periba[$n]["id_peribahasa"] = $v['id_peribahasa'];
+			$periba[$n]["nama_peribahasa"] = $v['nama_peribahasa'];
+			$periba[$n]["arti_peribahasa"] = $v['arti_peribahasa'];
+			$periba[$n]["id_kategori"] = $v['id_kategori'];
+			$periba[$n]["id_admin"] = $v['id_admin'];
+			$n++;
 		}
 	}
-
-	echo "<p>Peribahasa tidak ditemukan.</p>";
+	if(proses($periba)):
+		return;
+	else:
+		echo json_encode(["status" => "kosong","data"=>[],"relate"=>[]]);
+	endif;
 }
 ?>

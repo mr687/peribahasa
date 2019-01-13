@@ -1,29 +1,56 @@
 <?php  
-function kmp($text, $pattern)
+function kmp($t, $p)
 {
-	//strlen utk menghitung jml string
-	$textlen = strlen($text);
-	$pattlen = strlen($pattern);
-
-	for ($i = 0; $i < $textlen; $i++)
-	{
-		$match = true;
-		for ($j = 0; $j < $pattlen; $j++)
-		{
-			if(isset($text[$i + $j]) && isset($pattern[$j])):
-				if ($text[$i + $j] != $pattern[$j])
-				{
-					$match = false;
-					$i += $j;
-					break;
-				}
-			endif;
-		}
-
-		if ($match) return $i;		
+	$hasil = array();
+    $pattern = str_split($p);
+    $text    = str_split($t);
+ 
+    $lompat = preKMP($pattern);
+ 
+    $i = $j = 0;
+    $num=0;
+    while($j<count($text)){
+      if(isset($pattern[$i]) && isset($lompat[$i])){
+        while($i>-1 && $pattern[$i]!=$text[$j]){
+            $i = $lompat[$i];
+        }
+      }else{
+        $i = 0;
+      }
+ 
+      $i++;
+      $j++;
+      if($i>=count($pattern)){
+          $hasil[$num++]=$j-count($pattern);
+          if(isset($lompat[$i])){
+              $i = $lompat[$i];
+		  }
+      }
 	}
-	
-	
-	return false;
+	if(count($hasil) > 0):
+		return true;
+	else:
+		return false;
+	endif;
 }
+
+function preKMP($pattern){
+    $i = 0;
+    $j = $lompat[0] = -1;
+    while($i<count($pattern)){
+      while($j>-1 && $pattern[$i]!=$pattern[$j]){
+        $j = $lompat[$j];
+      }
+      $i++;
+      $j++;
+      if(isset($pattern[$i])&&isset($pattern[$j])){
+        if($pattern[$i]==$pattern[$j]){
+            $lompat[$i]=$lompat[$j];
+        }else{
+            $lompat[$i]=$j;
+        }
+      }
+    }
+    return $lompat;
+  }
 ?>

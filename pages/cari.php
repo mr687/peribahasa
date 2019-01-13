@@ -59,32 +59,98 @@ require_once('koneksi.php');
 				</div>
 				<div class="col-lg-12">
 					<div class="loader hidden"></div>
-					<div id="contentperibahasa" class="hidden">
-						
+					<div id="ctn" class="panel-body hidden">
+						<table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example">
+							<thead>
+								<tr>
+									<th>No</th>
+									<th>Peribahasa</th>
+									<th>Arti</th>
+								</tr>
+							</thead>
+							<tbody>
+								
+							</tbody>
+						</table>
+						<div id="wrapp" class="hidden">
+							<br>
+							<br>
+							<h3>Peribahasa Serupa</h3>
+							<hr>
+							<table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example2">
+								<thead>
+									<tr>
+										<th>No</th>
+										<th>Peribahasa</th>
+										<th>Arti</th>
+									</tr>
+								</thead>
+								<tbody>
+									
+								</tbody>
+							</table>
+						</div>
 					</div>
 				</div>
+			
             </div>
                 </div> 
             </div>
 		</div>	
 		<?php include 'sama/footer.php';?>
 	</body>
+
+	<script>
+		$(document).ready(function(){
+			$('#dataTables-example').DataTable({responsive:true});
+			$('#dataTables-example2').DataTable({responsive:true});
+		});
+	</script>
+
 	<script>
 		function getdata(){
-			$("#contentperibahasa").addClass("hidden");
 			$(".loader").removeClass("hidden");
-			var kata = $("#kata").val();
-			$.post(
-				"controller/proses.php",
-				{kata:kata})
-			.done(function(data){
-				$(".loader").addClass("hidden");
-				$("#contentperibahasa").removeClass("hidden");
-				$("#contentperibahasa").html(data);
-			});
+			$("#ctn").addClass("hidden");
+			var table = $("#dataTables-example").DataTable();
+			var table2 = $("#dataTables-example2").DataTable();
+			table.clear();
+			table2.clear();
+			var kataa = $("#kata").val();
+			$.post('controller/proses.php', {kata : kataa}, function(response) {
+				if(response["status"] == "sukses"){
+					$(".loader").addClass("hidden");
+					$("#ctn").removeClass("hidden");
+					var length = Object.keys(response["data"]).length;
+					for(var i = 0; i < length; i++){
+						var data = response["data"][i];
+						$('#dataTables-example').dataTable().fnAddData( [
+							i + 1,
+							data.nama_peribahasa,
+							data.arti_peribahasa
+						]);
+					}
+					
+					var len = Object.keys(response["relate"]).length;
+					if(len > 0){
+						$("#wrapp").removeClass('hidden');
+						for(var i = 0; i < len; i++){
+							var data = response["relate"][i];
+							$('#dataTables-example2').dataTable().fnAddData( [
+								i + 1,
+								data.nama_peribahasa,
+								data.arti_peribahasa
+							]);
+						}
+					}else{
+						$("#wrapp").addClass('hidden');
+					}
+				}
+
+			},'json');
 		}
 	</script>
-	<?php if($_GET['kata']): ?>
+	
+	<?php if(isset($_GET['kata'])): ?>
 		<script>
 			$("input[name=submit]").click();
 		</script>
